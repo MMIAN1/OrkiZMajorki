@@ -11,7 +11,10 @@ from PIL import Image, ImageTk
 model = load_model('Model/sea_mammal_classifier.h3')
 
 # Klasy modelu (dopasuj do swoich klas)
-class_names = ['Delfin', 'Humbak', 'Orka']
+class_names = ['Delfin', 'Humbak', 'Orka', 'Brak zwierzęcia lub nie rozpoznano']
+
+# Próg pewności
+threshold = 0.5
 
 
 # Funkcja do przetwarzania i przewidywania
@@ -21,7 +24,11 @@ def predict_image(file_path):
     img = np.expand_dims(img, axis=0) / 255.0
 
     prediction = model.predict(img)
-    predicted_class = class_names[np.argmax(prediction[0])]
+    max_pred = np.max(prediction[0])
+    if max_pred < threshold:
+        predicted_class = class_names[-1]
+    else:
+        predicted_class = class_names[np.argmax(prediction[0])]
     return predicted_class
 
 
