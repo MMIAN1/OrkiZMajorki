@@ -7,21 +7,22 @@ from matplotlib.animation import FuncAnimation
 import sounddevice as sd
 import queue
 import librosa
+import librosa.display
 import os
 from Rozpoznawanie import AI
 
 fs = 22050
-chunk_size = 2048
+chunk_size = 4096
 overlap_size = int(chunk_size * 0.75)
 duration = 20
 data_queue = queue.Queue()
 n_mels = 128
-output_path = "Probki/Live"
+output_path = "Live"
 probka = []
 
 fig, ax = plt.subplots()
 spectr_data = np.zeros((n_mels, int(fs / (chunk_size - overlap_size) * duration)))
-im = ax.imshow(spectr_data, aspect='auto', origin='lower', extent=[0, duration, 0, fs/2])
+im = ax.imshow(spectr_data, aspect='auto', origin='lower', extent=[0, duration, 0, fs/2], cmap='magma')
 plt.colorbar(im, ax=ax)
 ax.set_xlabel('Time [s]')
 ax.set_ylabel('Frequency [Hz]')
@@ -34,7 +35,7 @@ def audio_callback(indata, frames, time, status):
     data_queue.put(indata[:, 0])
 
 
-def create_spectrogram(data, sr=22050):
+def create_spectrogram(data, sr=22050, n_mels=128):
     S = librosa.feature.melspectrogram(y=data, sr=sr, n_mels=n_mels)
     S_DB = librosa.power_to_db(S, ref=np.max)
     return S_DB
@@ -42,10 +43,11 @@ def create_spectrogram(data, sr=22050):
 
 def draw_probka(spectr, output_path, number):
     plt.figure(figsize=(10, 4))
-    librosa.display.specshow(spectr, sr=fs, x_axis='time', y_axis='mel')
+    librosa.display.specshow(spectr, sr=fs, x_axis='time', y_axis='mel', cmap='magma')
     plt.colorbar(format='%+2.0f dB')
     plt.title('Mel-frequency spectrogram')
     plt.tight_layout()
+    plt.axis('off')
     filename = f"{number}.png"
     file_path = os.path.join(output_path, filename)
     os.makedirs(output_path, exist_ok=True)
@@ -55,12 +57,14 @@ def draw_probka(spectr, output_path, number):
 
 def sluchanie():
     sluchacz = AI()
+    odczyty = []
     for root, dirs, files in os.walk(output_path):
         for file in files:
-            if file.endswith(".png"):
-                file_path = os.path.join(output_path, file)
-                predicted_class, max_pred = sluchacz.predict_image(file_path)
-                print(f"Rozpoznany gatunek:{predicted_class}, pewność {max_pred}")
+            odczyty.append(file)
+
+    file_path = os.path.join(output_path, odczyty[-1])
+    predicted_class, max_pred = sluchacz.predict_image(file_path)
+    print(f"Rozpoznany gatunek:{predicted_class}, pewność: {max_pred}")
 
 
 def update_plot(frame, sr=fs):
@@ -68,15 +72,16 @@ def update_plot(frame, sr=fs):
     while not data_queue.empty():
         data = data_queue.get()
         S_DB = create_spectrogram(data, sr=sr)
-        spectr_data = np.roll(spectr_data, -1, axis=1)  # przsuwa wykres w lewo
+        spectr_data = np.roll(spectr_data, -1, axis=1)  # przesuwa wykres w lewo
         spectr_data[:, -1] = S_DB.mean(axis=1)
         probka.append(spectr_data[:, -200:].copy())
         if len(probka) % 100 == 0:
             draw_probka(probka[-1], output_path, len(probka))
             sluchanie()
         im.set_data(spectr_data)
-        im.set_clim(vmin=np.min(spectr_data), vmax=np.percentile(spectr_data, 95))
+        im.set_clim(vmin=-80, vmax=0)
         plt.draw()
+
 
 
 stream = sd.InputStream(callback=audio_callback, channels=1, samplerate=fs, blocksize=chunk_size)

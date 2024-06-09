@@ -3,39 +3,34 @@ from keras.src.saving.object_registration import CustomObjectScope
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array, load_img
 import os
-import tkinter as tk
-from tkinter import filedialog
-from PIL import Image, ImageTk
 import tensorflow.keras.utils
 import tensorflow as tf
-
 
 class CustomLayer:
     pass
 
-
 class AI():
 
     def predict_image(self, file_path):
-        with CustomObjectScope({'CustomLayer': CustomLayer}):  # Replace 'CustomLayer' with your actual custom layer
-            self.model = tf.keras.models.load_model('Model/sea_mammal_classifier.h6')
-        class_names = ['Bieluga', 'Delfin', 'Delfinek Pasiasty', 'Delfinowiec', 'Humbak', 'Kaszalot',
-                       'Orka', 'Wal Grenlandzki', 'Homoniewiadomo']
-        self.threshold = 0.9
+        with CustomObjectScope({'CustomLayer': CustomLayer}):
+            self.model = tf.keras.models.load_model('Model/sea_mammal_classifier.h42')
+        class_names = ['Bieluga', 'Delfin', 'Delfinek Pasiasty', 'Delfinowiec', 'Humbak', 'Kaszalot', 'Homoniewiadomo',
+                       'Orka', 'Wal Grenlandzki']
+        self.threshold = 0.8
         self.dir_path = "Tests/Orka_test"
 
         img = load_img(file_path, target_size=(128, 128), color_mode='grayscale')
         img = img_to_array(img)
         img = np.expand_dims(img, axis=0) / 255.0
 
+
         prediction = self.model.predict(img)
         max_pred = np.max(prediction[0])
         if max_pred < self.threshold:
-            predicted_class = class_names[-1]
+            predicted_class = class_names[-3]
         else:
             predicted_class = class_names[np.argmax(prediction[0])]
         return predicted_class, max_pred
-
 
     def tester(self, dir_path):
         predictions = []
@@ -47,9 +42,9 @@ class AI():
                     print(f"Predicted sea mammal: {prediction}")
                     predictions.append(prediction)
 
-
     def accuracy(self, dir_path):
         acc_preds = 0
+        acc_pred = 0
         preds = 0
         for root, dirs, files in os.walk(dir_path):
             for file in files:
@@ -62,12 +57,17 @@ class AI():
                         acc_pred = "humbak"
                     if "orka" in filename:
                         acc_pred = "orka"
-                    prediction = self.predict_image(file_path)
+                    prediction, max_pred = self.predict_image(file_path)
                     if prediction.lower() == acc_pred:
                         acc_preds += 1
                     preds += 1
+                    print(f"Predicted sea mammal: {prediction} {max_pred}")
 
         print(f"Predicted {acc_preds} out of {preds}")
+
+
+# sluchacz = AI()
+# sluchacz.accuracy("Live")
 
     # Funkcja do ładowania pliku
     # def load_file(self):
