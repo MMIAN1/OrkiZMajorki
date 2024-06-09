@@ -32,31 +32,33 @@ def create_spectrogram(audio_path, output_dir, sr=22500):
     librosa.display.specshow(S_dB, sr=sr, x_axis='time', y_axis='mel')
     plt.colorbar(format='%+2.0f dB')
     plt.title('Mel-frequency spectrogram')
-
+    plt.tight_layout()
+    plt.axis('off')  # Usuwa osie
     # Ustal ścieżkę do zapisu
     base_name = os.path.basename(audio_path)
     file_name, _ = os.path.splitext(base_name)
     output_path = os.path.join(output_dir, file_name + '.png')
 
-    plt.savefig(output_path)
+    plt.savefig(output_path, bbox_inches='tight', pad_inches=0)
     plt.close()
 
     print(f"Spektrogram zapisany jako {output_path}")
 
+def start_live_recognition():
+    # Główna część skryptu
+    output_filename = f"Live1.wav"
+    spectrogram_dir = "Probki_Testowe/NaZywo/"
 
-# Główna część skryptu
-output_filename = "output.wav"
-spectrogram_dir = "Probki/NaZywo/"
+    # Upewnij się, że katalog do zapisu spektrogramów istnieje
+    os.makedirs(spectrogram_dir, exist_ok=True)
 
-# Upewnij się, że katalog do zapisu spektrogramów istnieje
-os.makedirs(spectrogram_dir, exist_ok=True)
+    # Podaj URL, który chcesz nagrywać (użyj go w przeglądarce)
+    url = "https://live.orcasound.net/listen/port-townsend"
+    print(f"Otwórz stronę: {url} w przeglądarce i rozpocznij odtwarzanie dźwięku.")
 
-# Podaj URL, który chcesz nagrywać (użyj go w przeglądarce)
-url = "https://live.orcasound.net/listen/port-townsend"
-print(f"Otwórz stronę: {url} w przeglądarce i rozpocznij odtwarzanie dźwięku.")
+    # Nagrywaj dźwięk z systemu
+    record_audio(output_filename)
 
-# Nagrywaj dźwięk z systemu
-record_audio(output_filename)
-
-# Twórz spektrogram z nagranego pliku
-create_spectrogram(output_filename, spectrogram_dir)
+    # Twórz spektrogram z nagranego pliku
+    create_spectrogram(output_filename, spectrogram_dir)
+    os.remove(output_filename)
