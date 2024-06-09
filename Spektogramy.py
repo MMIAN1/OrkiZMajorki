@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Ścieżki
-input_base_dir = "Orka/"
+input_base_dir = "Probki_Wav/Orka/"
 output_base_dir = "Probki/Orka_Spekt"
 
 # Upewnij się, że katalog wyjściowy istnieje

@@ -11,7 +11,7 @@ class MarineMammalRecognizer(tk.Tk):
         super().__init__()
 
         self.title("Rozpoznawanie ssaków morskich")
-        self.geometry("600x500")
+        self.geometry("1280x720")
 
         self.label = tk.Label(self, text="Wybierz obraz spektrogramu, aby rozpoznać gatunek ssaka morskiego")
         self.label.pack(pady=20)
@@ -31,7 +31,7 @@ class MarineMammalRecognizer(tk.Tk):
         self.result_label = tk.Label(self, text="")
         self.result_label.pack(pady=20)
 
-        self.model = tf.keras.models.load_model('Model/sea_mammal_classifier.h4')  # Załaduj model tutaj
+        self.model = tf.keras.models.load_model('Model/sea_mammal_classifier.h4')
 
     def load_image(self):
         file_path = filedialog.askopenfilename()
