@@ -5,8 +5,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Ścieżki
-input_base_dir = "Probki_Wav/Orka/"
-output_base_dir = "Probki/Orka_Spekt"
+input_base_dir = "Probki_Wav/Wal_Grenlandzki/"
+output_base_dir = "Probki/WalGrenlandzki_Spekt"
 
 # Upewnij się, że katalog wyjściowy istnieje
 os.makedirs(output_base_dir, exist_ok=True)

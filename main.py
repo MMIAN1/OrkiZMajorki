@@ -31,7 +31,7 @@ class MarineMammalRecognizer(tk.Tk):
         self.result_label = tk.Label(self, text="")
         self.result_label.pack(pady=20)
 
-        self.model = tf.keras.models.load_model('Model/sea_mammal_classifier.h4')
+        self.model = tf.keras.models.load_model('Model/sea_mammal_classifier.h5')
 
     def load_image(self):
         file_path = filedialog.askopenfilename()
@@ -61,7 +61,7 @@ class MarineMammalRecognizer(tk.Tk):
         start_live_recognition()  # Wywołaj funkcję rozpoznawania na żywo
 
     def get_species_name(self, species_id):
-        species_dict = {0: "Delfin", 1: "Humbak", 2: "Nie rozpoznano", 3: "Orka"}
+        species_dict = {0: "Bieluga", 1: "Delfin", 2: "Delfin Pasiasty", 3: "Delfinowiec", 4: "Humbak", 5: "Kaszalot", 6: "Mors", 7: "Nie Wykryto Zwierzęcia", 8: "Orka", 9: "Wal Grenlandzki"}
         return species_dict.get(species_id, "Nieznany gatunek")
 
 
