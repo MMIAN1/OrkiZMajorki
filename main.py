@@ -31,7 +31,8 @@ class MarineMammalRecognizer(tk.Tk):
         self.result_label = tk.Label(self, text="")
         self.result_label.pack(pady=20)
 
-        self.model = tf.keras.models.load_model('Model/sea_mammal_classifier.h5')
+        self.model = tf.keras.models.load_model('Model/sea_mammal_classifier.h6')
+        self.threshold = 0.8
 
     def load_image(self):
         file_path = filedialog.askopenfilename()
@@ -51,9 +52,18 @@ class MarineMammalRecognizer(tk.Tk):
 
             # Przewidywanie
             predictions = self.model.predict(image_array)
+            confidence = np.max(predictions)
             species = np.argmax(predictions)
             species_name = self.get_species_name(species)
-            self.result_label.config(text=f"Rozpoznany gatunek: {species_name}")
+
+
+            if self.get_species_name(species) == "Nie udało się rozpoznać zwierzęcia":
+                self.result_label.config(text=f"Nie udało się rozpoznać zwierzęcia")
+
+            elif confidence < self.threshold:
+                self.result_label.config(text=f"Nie udało się rozpoznać zwierzęcia")
+            else:
+                self.result_label.config(text=f"Rozpoznany gatunek: {species_name} (Pewność: {confidence:.2f})")
         else:
             messagebox.showerror("Błąd", "Najpierw wybierz obraz spektrogramu")
 
@@ -61,8 +71,8 @@ class MarineMammalRecognizer(tk.Tk):
         start_live_recognition()  # Wywołaj funkcję rozpoznawania na żywo
 
     def get_species_name(self, species_id):
-        species_dict = {0: "Bieluga", 1: "Delfin", 2: "Delfin Pasiasty", 3: "Delfinowiec", 4: "Humbak", 5: "Kaszalot", 6: "Mors", 7: "Nie Wykryto Zwierzęcia", 8: "Orka", 9: "Wal Grenlandzki"}
-        return species_dict.get(species_id, "Nieznany gatunek")
+        species_dict = {0: "Bieluga", 1: "Delfin", 2: "Delfin Pasiasty", 3: "Delfinowiec", 4: "Humbak", 5: "Kaszalot", 6: "Nie udało się rozpoznać zwierzęcia", 7: "Orka", 8: "Wal Grenlandzki"}
+        return species_dict.get(species_id, "Nie udało się rozpoznać zwierzęcia")
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 # Parametry
 input_shape = (128, 128, 1)  # Zakładając, że spektrogramy są skalowane do 128x128 pikseli
-num_classes = 10  # Liczba gatunków
+num_classes = 8  # Liczba gatunków
 
 # Tworzenie modelu
 model = Sequential([
@@ -75,4 +75,4 @@ history = model.fit(
 loss, accuracy = model.evaluate(validation_generator)
 print(f'Validation accuracy: {accuracy}')
 
-model.save('sea_mammal_classifier.h5')
+model.save('sea_mammal_classifier.h7')

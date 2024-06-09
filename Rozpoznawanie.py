@@ -7,11 +7,11 @@ from tkinter import filedialog
 from PIL import Image, ImageTk
 
 # Ładowanie modelu
-model = load_model('Model/sea_mammal_classifier.h4')
+model = load_model('Model/sea_mammal_classifier.h6')
 
 
 # Klasy modelu (dopasuj do swoich klas)
-class_names = ['Delfin', 'Humbak', 'Brak zwierzęcia lub nie rozpoznano', 'Orka']
+class_names = ['Bieluga', 'Delfin', 'Delfinek Pasiasty', 'Delfinowiec', 'Humbak', 'Kaszalot', 'Nie wykryto', 'Orka', 'Wal Grenlandzki']
 
 # Próg pewności
 threshold = 0.5
