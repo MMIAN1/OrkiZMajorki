@@ -1,10 +1,14 @@
 import numpy as np
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing.image import img_to_array, load_img
+import os
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import sounddevice as sd
 import queue
 import librosa
 import os
+from Rozpoznawanie import AI
 
 fs = 22050
 chunk_size = 2048
@@ -12,7 +16,7 @@ overlap_size = int(chunk_size * 0.75)
 duration = 20
 data_queue = queue.Queue()
 n_mels = 128
-output_path = "Probki"
+output_path = "Probki/Live"
 probka  =[]
 
 fig, ax = plt.subplots()
@@ -60,10 +64,20 @@ def update_plot(frame, sr=fs):
         if len(probka) % 10 == 0:
             draw_probka(probka[-1], output_path, len(probka))
 
-        print(f"Ilość zebranych próbek: {len(probka)}")
         im.set_data(spectr_data)
         im.set_clim(vmin=np.min(spectr_data), vmax=np.percentile(spectr_data, 95))
         plt.draw()
+
+
+def sluchanie():
+    sluchacz = AI()
+    for root, dirs, files in os.walk(output_path):
+        for file in files:
+            if file.endswith(".png"):
+                file_path = os.path.join(output_path, file)
+                predicted_class = sluchacz.predict_image(file_path)
+                print(f"{predicted_class}")
+
 
 
 stream = sd.InputStream(callback=audio_callback, channels=1, samplerate=fs, blocksize=chunk_size)
@@ -71,6 +85,7 @@ stream.start()
 
 ani = FuncAnimation(fig, update_plot, interval=10, blit=False)
 
+sluchanie()
 plt.show()
 
 
