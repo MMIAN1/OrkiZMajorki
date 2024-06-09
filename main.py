@@ -138,7 +138,7 @@ class MarineMammalRecognizer(tk.Tk):
         plt.close()
 
     def update_plot(self, frame, sr=fs):
-        self.output_path = "Probki/Live"
+        self.output_path = "Live"
         self.probka = []
         while not data_queue.empty():
             data = data_queue.get()
