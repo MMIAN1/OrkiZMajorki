@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 # Ścieżki
 input_base_dir = "Probki_Wav/Orka/"
 output_base_dir = "Probki/Orka_Spekt"
+gatunek = "Delfin_test"
+input_base_dir = f"Tests/{gatunek}"
+output_base_dir = f"Tests/{gatunek}"
 
 # Upewnij się, że katalog wyjściowy istnieje
 os.makedirs(output_base_dir, exist_ok=True)
@@ -22,7 +25,7 @@ def create_spectrogram(audio_path, output_path, sr=22050):
     plt.colorbar(format='%+2.0f dB')
     plt.title('Mel-frequency spectrogram')
     plt.tight_layout()
-    plt.axis('off')  # Usuwa osie
+    # plt.axis('off')  # Usuwa osie
     plt.savefig(output_path, bbox_inches='tight', pad_inches=0)
     plt.close()
 

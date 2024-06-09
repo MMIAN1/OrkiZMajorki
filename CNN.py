@@ -27,6 +27,7 @@ model.summary()
 
 # Ścieżka do katalogu ze spektrogramami
 data_dir = 'Probki/'
+model_dir = "Model/"
 
 # Parametry wczytywania
 img_width, img_height = 128, 128  # Wymiary spektrogramu
@@ -76,3 +77,4 @@ loss, accuracy = model.evaluate(validation_generator)
 print(f'Validation accuracy: {accuracy}')
 
 model.save('sea_mammal_classifier.h4')
+model.save(f'{model_dir}sea_mammal_classifier.h69')
