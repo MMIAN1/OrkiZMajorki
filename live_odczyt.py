@@ -17,7 +17,7 @@ duration = 20
 data_queue = queue.Queue()
 n_mels = 128
 output_path = "Probki/Live"
-probka  =[]
+probka = []
 
 fig, ax = plt.subplots()
 spectr_data = np.zeros((n_mels, int(fs / (chunk_size - overlap_size) * duration)))
@@ -59,22 +59,21 @@ def sluchanie():
         for file in files:
             if file.endswith(".png"):
                 file_path = os.path.join(output_path, file)
-                predicted_class = sluchacz.predict_image(file_path)
-                print(f"{predicted_class}")
+                predicted_class, max_pred = sluchacz.predict_image(file_path)
+                print(f"Rozpoznany gatunek:{predicted_class}, pewność {max_pred}")
 
-# sluchanie()
 
 def update_plot(frame, sr=fs):
     global spectr_data, im, probka
     while not data_queue.empty():
         data = data_queue.get()
         S_DB = create_spectrogram(data, sr=sr)
-        spectr_data = np.roll(spectr_data, -1, axis=1) # przsuwa wykres w lewo
+        spectr_data = np.roll(spectr_data, -1, axis=1)  # przsuwa wykres w lewo
         spectr_data[:, -1] = S_DB.mean(axis=1)
-        probka.append(spectr_data[:, -100:].copy())
-        if len(probka) % 10 == 0:
+        probka.append(spectr_data[:, -200:].copy())
+        if len(probka) % 100 == 0:
             draw_probka(probka[-1], output_path, len(probka))
-
+            sluchanie()
         im.set_data(spectr_data)
         im.set_clim(vmin=np.min(spectr_data), vmax=np.percentile(spectr_data, 95))
         plt.draw()

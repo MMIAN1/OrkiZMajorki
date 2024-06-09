@@ -1,20 +1,27 @@
 import numpy as np
+from keras.src.saving.object_registration import CustomObjectScope
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array, load_img
 import os
 import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageTk
-from tensorflow.keras.utils import CustomObjectScope
+import tensorflow.keras.utils
+import tensorflow as tf
+
+
+class CustomLayer:
+    pass
+
 
 class AI():
 
     def predict_image(self, file_path):
         with CustomObjectScope({'CustomLayer': CustomLayer}):  # Replace 'CustomLayer' with your actual custom layer
             self.model = tf.keras.models.load_model('Model/sea_mammal_classifier.h6')
-        class_names = ['Bieluga', 'Delfin', 'Delfinek Pasiasty', 'Delfinowiec', 'Humbak', 'Kaszalot', 'Homoniewiadomo',
-                       'Orka', 'Wal Grenlandzki']
-        self.threshold = 0.5
+        class_names = ['Bieluga', 'Delfin', 'Delfinek Pasiasty', 'Delfinowiec', 'Humbak', 'Kaszalot',
+                       'Orka', 'Wal Grenlandzki', 'Homoniewiadomo']
+        self.threshold = 0.9
         self.dir_path = "Tests/Orka_test"
 
         img = load_img(file_path, target_size=(128, 128), color_mode='grayscale')
@@ -27,7 +34,7 @@ class AI():
             predicted_class = class_names[-1]
         else:
             predicted_class = class_names[np.argmax(prediction[0])]
-        return predicted_class
+        return predicted_class, max_pred
 
 
     def tester(self, dir_path):
@@ -61,7 +68,6 @@ class AI():
                     preds += 1
 
         print(f"Predicted {acc_preds} out of {preds}")
-
 
     # Funkcja do ładowania pliku
     # def load_file(self):
