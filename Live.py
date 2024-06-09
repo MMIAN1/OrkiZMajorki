@@ -44,6 +44,7 @@ def create_spectrogram(audio_path, output_dir, sr=22500):
 
     print(f"Spektrogram zapisany jako {output_path}")
 
+
 def start_live_recognition():
     # Główna część skryptu
     output_filename = f"Live1.wav"

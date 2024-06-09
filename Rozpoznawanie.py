@@ -5,11 +5,13 @@ import os
 import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageTk
+from tensorflow.keras.utils import CustomObjectScope
 
 class AI():
 
     def predict_image(self, file_path):
-        self.model = load_model('Model/sea_mammal_classifier.h6')
+        with CustomObjectScope({'CustomLayer': CustomLayer}):  # Replace 'CustomLayer' with your actual custom layer
+            self.model = tf.keras.models.load_model('Model/sea_mammal_classifier.h6')
         class_names = ['Bieluga', 'Delfin', 'Delfinek Pasiasty', 'Delfinowiec', 'Humbak', 'Kaszalot', 'Homoniewiadomo',
                        'Orka', 'Wal Grenlandzki']
         self.threshold = 0.5

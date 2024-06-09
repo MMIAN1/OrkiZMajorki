@@ -53,6 +53,17 @@ def draw_probka(spectr, output_path, number):
     plt.close()
 
 
+def sluchanie():
+    sluchacz = AI()
+    for root, dirs, files in os.walk(output_path):
+        for file in files:
+            if file.endswith(".png"):
+                file_path = os.path.join(output_path, file)
+                predicted_class = sluchacz.predict_image(file_path)
+                print(f"{predicted_class}")
+
+# sluchanie()
+
 def update_plot(frame, sr=fs):
     global spectr_data, im, probka
     while not data_queue.empty():
@@ -69,23 +80,9 @@ def update_plot(frame, sr=fs):
         plt.draw()
 
 
-def sluchanie():
-    sluchacz = AI()
-    for root, dirs, files in os.walk(output_path):
-        for file in files:
-            if file.endswith(".png"):
-                file_path = os.path.join(output_path, file)
-                predicted_class = sluchacz.predict_image(file_path)
-                print(f"{predicted_class}")
-
-
-
 stream = sd.InputStream(callback=audio_callback, channels=1, samplerate=fs, blocksize=chunk_size)
 stream.start()
 
 ani = FuncAnimation(fig, update_plot, interval=10, blit=False)
 
-sluchanie()
 plt.show()
-
-
