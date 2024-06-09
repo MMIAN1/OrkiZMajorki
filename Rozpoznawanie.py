@@ -17,11 +17,11 @@ class CustomLayer:
 class AI():
 
     def predict_image(self, file_path):
-        with CustomObjectScope({'CustomLayer': CustomLayer}):  # Replace 'CustomLayer' with your actual custom layer
+        with CustomObjectScope({'CustomLayer': CustomLayer}):
             self.model = tf.keras.models.load_model('Model/sea_mammal_classifier.h6')
-        class_names = ['Bieluga', 'Delfin', 'Delfinek Pasiasty', 'Delfinowiec', 'Humbak', 'Kaszalot',
-                       'Orka', 'Wal Grenlandzki', 'Homoniewiadomo']
-        self.threshold = 0.9
+        class_names = ['Bieluga', 'Delfin', 'Delfinek Pasiasty', 'Delfinowiec', 'Humbak', 'Kaszalot', 'Homoniewiadomo',
+                       'Orka', 'Wal Grenlandzki']
+        self.threshold = 0.8
         self.dir_path = "Tests/Orka_test"
 
         img = load_img(file_path, target_size=(128, 128), color_mode='grayscale')
@@ -62,12 +62,17 @@ class AI():
                         acc_pred = "humbak"
                     if "orka" in filename:
                         acc_pred = "orka"
-                    prediction = self.predict_image(file_path)
+                    prediction, max_pred = self.predict_image(file_path)
                     if prediction.lower() == acc_pred:
                         acc_preds += 1
                     preds += 1
+                    print(f"Predicted sea mammal: {prediction}")
 
         print(f"Predicted {acc_preds} out of {preds}")
+
+
+# sluchacz = AI()
+# sluchacz.accuracy("Tests/Orka_test")
 
     # Funkcja do ładowania pliku
     # def load_file(self):

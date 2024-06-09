@@ -55,12 +55,14 @@ def draw_probka(spectr, output_path, number):
 
 def sluchanie():
     sluchacz = AI()
+    odczyty = []
     for root, dirs, files in os.walk(output_path):
         for file in files:
-            if file.endswith(".png"):
-                file_path = os.path.join(output_path, file)
-                predicted_class, max_pred = sluchacz.predict_image(file_path)
-                print(f"Rozpoznany gatunek:{predicted_class}, pewność {max_pred}")
+            odczyty.append(file)
+
+    file_path = os.path.join(output_path, odczyty[-1])
+    predicted_class, max_pred = sluchacz.predict_image(file_path)
+    print(f"Rozpoznany gatunek:{predicted_class}, pewność: {max_pred}")
 
 
 def update_plot(frame, sr=fs):
