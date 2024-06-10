@@ -62,7 +62,7 @@ class MarineMammalRecognizer(tk.Tk):
         # Initialize matplotlib figure and axes
         self.fig, self.ax = plt.subplots()
         self.spectr_data = np.zeros((n_mels, int(fs / (chunk_size - overlap_size) * duration)))
-        self.im = self.ax.imshow(self.spectr_data, aspect='auto', origin='lower', extent=[0, duration, 0, fs/2])
+        self.im = self.ax.imshow(self.spectr_data, aspect='auto', origin='lower', extent=[0, duration, 0, fs/2], cmap='magma')
         plt.colorbar(self.im, ax=self.ax)
         self.ax.set_xlabel('Time [s]')
         self.ax.set_ylabel('Frequency [Hz]')
@@ -71,6 +71,9 @@ class MarineMammalRecognizer(tk.Tk):
         # Create a canvas for the matplotlib figure
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
         self.canvas.get_tk_widget().pack()
+
+        self.output_path = "Live"
+        self.probka = []
 
     def load_image(self):
         file_path = filedialog.askopenfilename()
@@ -81,13 +84,8 @@ class MarineMammalRecognizer(tk.Tk):
             self.image_label.config(image=self.image_tk)
             self.result_label.config(text="")
 
-    def predict_species(self):
-        if hasattr(self, 'image'):
-            # Przygotuj obraz do przewidywania
-            image_array = np.array(self.image.resize((128, 128))) / 255.0
-            image_array = np.expand_dims(image_array, axis=-1)
-            image_array = np.expand_dims(image_array, axis=0)
-
+    def predict_species(self, image_array):
+        if image_array is not None:
             # Przewidywanie
             predictions = self.model.predict(image_array)
             confidence = np.max(predictions)
@@ -101,7 +99,7 @@ class MarineMammalRecognizer(tk.Tk):
             else:
                 self.result_label.config(text=f"Rozpoznany gatunek: {species_name} (Pewność: {confidence:.2f})")
         else:
-            messagebox.showerror("Błąd", "Najpierw wybierz obraz spektrogramu")
+            messagebox.showerror("Błąd", "Brak danych do rozpoznania")
 
     def start_live_recognition(self):
         start_live_recognition()
@@ -127,10 +125,11 @@ class MarineMammalRecognizer(tk.Tk):
 
     def draw_probka(self, spectr, output_path, number):
         plt.figure(figsize=(10, 4))
-        librosa.display.specshow(spectr, sr=fs, x_axis='time', y_axis='mel')
+        librosa.display.specshow(spectr, sr=fs, x_axis='time', y_axis='mel', cmap='magma')
         plt.colorbar(format='%+2.0f dB')
         plt.title('Mel-frequency spectrogram')
         plt.tight_layout()
+        plt.axis('off')
         filename = f"{number}.png"
         file_path = os.path.join(output_path, filename)
         os.makedirs(output_path, exist_ok=True)
@@ -138,16 +137,19 @@ class MarineMammalRecognizer(tk.Tk):
         plt.close()
 
     def update_plot(self, frame, sr=fs):
-        self.output_path = "Live"
-        self.probka = []
         while not data_queue.empty():
             data = data_queue.get()
             S_DB = self.create_spectrogram(data, sr=sr)
             self.spectr_data = np.roll(self.spectr_data, -1, axis=1)  # przesuwa wykres w lewo
             self.spectr_data[:, -1] = S_DB.mean(axis=1)
-            self.probka.append(self.spectr_data[:, -100:].copy())
-            if len(self.probka) % 10 == 0:
+            self.probka.append(self.spectr_data[:, -200:].copy())
+            print(f"Mamy {len(self.probka)} próbek")
+            if len(self.probka) % 100 == 0:
                 self.draw_probka(self.probka[-1], self.output_path, len(self.probka))
+                image_array = self.spectr_data[:, -128:].T
+                image_array = np.expand_dims(image_array, axis=-1)
+                image_array = np.expand_dims(image_array, axis=0)
+                self.predict_species(image_array)
             self.im.set_data(self.spectr_data)
             self.im.set_clim(vmin=np.min(self.spectr_data), vmax=np.percentile(self.spectr_data, 95))
             self.canvas.draw()

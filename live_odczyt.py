@@ -75,6 +75,7 @@ def update_plot(frame, sr=fs):
         spectr_data = np.roll(spectr_data, -1, axis=1)  # przesuwa wykres w lewo
         spectr_data[:, -1] = S_DB.mean(axis=1)
         probka.append(spectr_data[:, -200:].copy())
+        print(f"Mamy {len(probka)} próbek")
         if len(probka) % 100 == 0:
             draw_probka(probka[-1], output_path, len(probka))
             sluchanie()
