@@ -55,10 +55,10 @@ class MarineMammalRecognizer(tk.Tk):
                                        font=("Helvetica", 12), bg="#4CAF50", fg="white")
         self.upload_button.pack(pady=5)
 
-        self.image_label = tk.Label(self.main_frame, bg='lightblue')  # Set the background color to light blue
+        self.image_label = tk.Label(self.main_frame, bg='lightblue')
         self.image_label.pack(pady=5)
 
-        self.predict_button = tk.Button(self.main_frame, text="Rozpoznaj gatunek", command=self.predict_species,
+        self.predict_button = tk.Button(self.main_frame, text="Rozpoznaj gatunek", command=self.on_predict_button_click,
                                         font=("Helvetica", 12), bg="#2196F3", fg="white")
         self.predict_button.pack(pady=5)
 
@@ -70,14 +70,14 @@ class MarineMammalRecognizer(tk.Tk):
                                        font=("Helvetica", 12), bg="#9C27B0", fg="white")
         self.listen_button.pack(pady=5)
 
-        self.result_frame = tk.Frame(self.main_frame, bg="lightblue")  # Set the background color to light blue
+        self.result_frame = tk.Frame(self.main_frame, bg="lightblue")
         self.result_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=20, pady=10)
-        self.result_label = tk.Label(self.result_frame, text="", font=("Helvetica", 12), bg="lightblue")  # Set the background color to light blue
+        self.result_label = tk.Label(self.result_frame, text="", font=("Helvetica", 12), bg="lightblue")
         self.result_label.pack(pady=5)
 
-        self.result_frame_lab = tk.Frame(self.main_frame, bg="lightblue")  # Set the background color to light blue
+        self.result_frame_lab = tk.Frame(self.main_frame, bg="lightblue")
         self.result_frame_lab.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=20, pady=10)
-        self.result_label_lab = tk.Label(self.result_frame_lab, text="", font=("Helvetica", 12), bg="lightblue")  # Set the background color to light blue
+        self.result_label_lab = tk.Label(self.result_frame_lab, text="", font=("Helvetica", 12), bg="lightblue")
         self.result_label_lab.pack(pady=5)
 
         try:
@@ -108,15 +108,25 @@ class MarineMammalRecognizer(tk.Tk):
 
         self.output_path = "Live/Micro"
         self.probka = []
+        self.image_array = None
 
     def load_image(self):
         file_path = filedialog.askopenfilename()
         if file_path:
             self.image = Image.open(file_path).convert('L')
-            self.image.thumbnail((300, 300))
+            self.image = self.image.resize((128, 128), Image.LANCZOS)  # Resize to exact 128x128 dimensions
             self.image_tk = ImageTk.PhotoImage(self.image)
             self.image_label.config(image=self.image_tk)
             self.result_label.config(text="")
+
+            # Prepare the image array for prediction
+            image = np.array(self.image)
+            image = image / 255.0  # Normalize the image
+            image = np.expand_dims(image, axis=(0, -1))  # Expand dimensions to fit the model input shape
+            self.image_array = image
+
+    def on_predict_button_click(self):
+        self.predict_species(self.image_array)
 
     def predict_species(self, image_array):
         if image_array is not None:

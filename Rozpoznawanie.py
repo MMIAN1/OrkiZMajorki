@@ -67,7 +67,7 @@ class AI():
 
 
 # sluchacz = AI()
-# sluchacz.accuracy("Probki_Testowe/Testowe")
+# sluchacz.accuracy("Tests/Delfin_test")
 
     # Funkcja do ładowania pliku
     # def load_file(self):
