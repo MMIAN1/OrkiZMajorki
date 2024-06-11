@@ -84,7 +84,6 @@ def update_plot(frame, sr=fs):
         plt.draw()
 
 
-
 stream = sd.InputStream(callback=audio_callback, channels=1, samplerate=fs, blocksize=chunk_size)
 stream.start()
 

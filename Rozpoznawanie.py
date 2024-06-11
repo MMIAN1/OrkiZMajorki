@@ -13,7 +13,7 @@ class AI():
 
     def predict_image(self, file_path):
         with CustomObjectScope({'CustomLayer': CustomLayer}):
-            self.model = tf.keras.models.load_model('Model/sea_mammal_classifier.h42')
+            self.model = tf.keras.models.load_model('Model/sea_mammal_classifier.h6')
         class_names = ['Bieluga', 'Delfin', 'Delfinek Pasiasty', 'Delfinowiec', 'Humbak', 'Kaszalot', 'Homoniewiadomo',
                        'Orka', 'Wal Grenlandzki']
         self.threshold = 0.8
@@ -67,7 +67,7 @@ class AI():
 
 
 # sluchacz = AI()
-# sluchacz.accuracy("Live")
+# sluchacz.accuracy("Probki_Testowe/Testowe")
 
     # Funkcja do ładowania pliku
     # def load_file(self):
