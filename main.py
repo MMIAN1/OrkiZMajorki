@@ -24,40 +24,61 @@ duration = 20
 data_queue = queue.Queue()
 n_mels = 128
 
+
 class MarineMammalRecognizer(tk.Tk):
     def __init__(self):
         super().__init__()
 
         self.title("Rozpoznawanie ssaków morskich")
         self.geometry("1280x720")
+        self.configure(bg="lightblue")
 
-        self.label = tk.Label(self, text="Wybierz obraz spektrogramu, aby rozpoznać gatunek ssaka morskiego")
-        self.label.pack(pady=20)
+        # Load and set background image
+        self.bg_image = Image.open('Grafika/background.jpg')
+        self.bg_photo = ImageTk.PhotoImage(self.bg_image)
 
-        self.upload_button = tk.Button(self, text="Wybierz plik", command=self.load_image)
-        self.upload_button.pack(pady=10)
+        self.bg_label = tk.Label(self, image=self.bg_photo)
+        self.bg_label.place(relwidth=1, relheight=1)
 
-        self.image_label = tk.Label(self)
-        self.image_label.pack(pady=10)
+        self.main_frame = tk.Frame(self, bg='lightblue')
+        self.main_frame.pack(fill='both', expand=True)
 
-        self.predict_button = tk.Button(self, text="Rozpoznaj gatunek", command=self.predict_species)
-        self.predict_button.pack(pady=10)
+        self.title_label = tk.Label(self.main_frame, text="Rozpoznawanie ssaków morskich",
+                                    font=("Helvetica", 24, "bold"), bg="#4CAF50", fg="white")
+        self.title_label.pack(pady=10)
 
-        self.live_button = tk.Button(self, text="Rozpoznawanie na żywo", command=self.start_live_recognition)
-        self.live_button.pack(pady=10)
+        self.label = tk.Label(self.main_frame, text="Wybierz obraz spektrogramu, aby rozpoznać gatunek ssaka morskiego",
+                              font=("Helvetica", 14), bg="#4CAF50", fg="white")
+        self.label.pack(pady=5)
 
-        self.listen_button = tk.Button(self, text="Nasłuchiwanie", command=self.start_listening)
-        self.listen_button.pack(pady=10)
+        self.upload_button = tk.Button(self.main_frame, text="Wybierz plik", command=self.load_image,
+                                       font=("Helvetica", 12), bg="#4CAF50", fg="white")
+        self.upload_button.pack(pady=5)
 
-        self.result_frame = tk.Frame(self)
-        self.result_frame.pack(side=tk.LEFT, anchor=tk.S, pady=20)
-        self.result_label = tk.Label(self.result_frame, text="")
-        self.result_label.pack()
+        self.image_label = tk.Label(self.main_frame, bg='lightblue')  # Set the background color to light blue
+        self.image_label.pack(pady=5)
 
-        self.result_frame_lab = tk.Frame(self)
-        self.result_frame_lab.pack(side=tk.RIGHT, anchor=tk.S, pady=20)
-        self.result_label_lab = tk.Label(self.result_frame_lab, text="")
-        self.result_label_lab.pack()
+        self.predict_button = tk.Button(self.main_frame, text="Rozpoznaj gatunek", command=self.predict_species,
+                                        font=("Helvetica", 12), bg="#2196F3", fg="white")
+        self.predict_button.pack(pady=5)
+
+        self.live_button = tk.Button(self.main_frame, text="Rozpoznawanie na żywo", command=self.start_live_recognition,
+                                     font=("Helvetica", 12), bg="#FF9800", fg="white")
+        self.live_button.pack(pady=5)
+
+        self.listen_button = tk.Button(self.main_frame, text="Nasłuchiwanie", command=self.start_listening,
+                                       font=("Helvetica", 12), bg="#9C27B0", fg="white")
+        self.listen_button.pack(pady=5)
+
+        self.result_frame = tk.Frame(self.main_frame, bg="lightblue")  # Set the background color to light blue
+        self.result_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=20, pady=10)
+        self.result_label = tk.Label(self.result_frame, text="", font=("Helvetica", 12), bg="lightblue")  # Set the background color to light blue
+        self.result_label.pack(pady=5)
+
+        self.result_frame_lab = tk.Frame(self.main_frame, bg="lightblue")  # Set the background color to light blue
+        self.result_frame_lab.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=20, pady=10)
+        self.result_label_lab = tk.Label(self.result_frame_lab, text="", font=("Helvetica", 12), bg="lightblue")  # Set the background color to light blue
+        self.result_label_lab.pack(pady=5)
 
         try:
             self.model = tf.keras.models.load_model('Model/sea_mammal_classifier.h6')
@@ -77,13 +98,13 @@ class MarineMammalRecognizer(tk.Tk):
         self.ax.set_title("Mel-frequency spectrogram")
 
         self.canvas_micro = FigureCanvasTkAgg(self.fig_micro, master=self.result_frame)
-        self.canvas_micro.get_tk_widget().pack()
+        self.canvas_micro.get_tk_widget().pack(pady=10, fill=tk.BOTH, expand=True)
 
         # Initialize the live recognition with result_label_lab
         self.live_recognition = Live("https://live.orcasound.net/listen/port-townsend", self.result_label_lab)
         self.fig_lab = self.live_recognition.fig_lab
         self.canvas_lab = FigureCanvasTkAgg(self.fig_lab, master=self.result_frame_lab)
-        self.canvas_lab.get_tk_widget().pack()
+        self.canvas_lab.get_tk_widget().pack(pady=10, fill=tk.BOTH, expand=True)
 
         self.output_path = "Live/Micro"
         self.probka = []
@@ -107,7 +128,7 @@ class MarineMammalRecognizer(tk.Tk):
             if species_name == "Nie udało się rozpoznać zwierzęcia" or confidence < self.threshold:
                 self.result_label.config(text=f"Nie udało się rozpoznać zwierzęcia")
             else:
-                self.result_label.config(text=f"Gatunek z mikrofonu: {species_name} (Pewność: {confidence:.2f})")
+                self.result_label.config(text=f"Rozpoznany gatunek: {species_name} (Pewność: {confidence:.2f})")
         else:
             messagebox.showerror("Błąd", "Brak danych do rozpoznania")
 
@@ -157,7 +178,7 @@ class MarineMammalRecognizer(tk.Tk):
             self.spectr_data = np.roll(self.spectr_data, -1, axis=1)
             self.spectr_data[:, -1] = S_DB.mean(axis=1)
             self.probka.append(self.spectr_data[:, -200:].copy())
-            # print(f"Mamy {len(self.probka)} próbek")
+            print(f"Mamy {len(self.probka)} próbek")
             if len(self.probka) % 100 == 0:
                 self.draw_probka(self.probka[-1], self.output_path, len(self.probka))
                 image_array = self.spectr_data[:, -128:].T
@@ -172,6 +193,7 @@ class MarineMammalRecognizer(tk.Tk):
         species_dict = {0: "Bieluga", 1: "Delfin", 2: "Delfin Pasiasty", 3: "Delfinowiec", 4: "Humbak", 5: "Kaszalot",
                         6: "Nie udało się rozpoznać zwierzęcia", 7: "Orka", 8: "Wal Grenlandzki"}
         return species_dict.get(species_id, "Nie udało się rozpoznać zwierzęcia")
+
 
 if __name__ == "__main__":
     app = MarineMammalRecognizer()

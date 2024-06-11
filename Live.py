@@ -1,10 +1,9 @@
-import io
 import os
 import requests
 import numpy as np
 import librosa
 import librosa.display
-from tkinter import messagebox
+from tkinter import Label, messagebox
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import tensorflow as tf
@@ -12,7 +11,6 @@ import tensorflow as tf
 class Live:
     def __init__(self, url, result_label_lab, duration=10, sample_rate=44100, channels=1):
         self.url = url
-        self.result_label_lab = result_label_lab
         self.duration = duration
         self.sample_rate = sample_rate
         self.channels = channels
@@ -33,6 +31,7 @@ class Live:
         self.threshold = 0.8
         self.probka = []
         self.output_path = "Live/Lab"
+        self.result_label = result_label_lab
 
     def start_live_recognition(self):
         if self.ani is None:
@@ -48,11 +47,11 @@ class Live:
             species_name = self.get_species_name(species)
 
             if species_name == "Nie udało się rozpoznać zwierzęcia" or confidence < self.threshold:
-                self.result_label_lab.config(text=f"Nie udało się rozpoznać zwierzęcia")
+                self.result_label.config(text=f"Nie udało się rozpoznać zwierzęcia")
             else:
-                self.result_label_lab.config(text=f"Gatunek z hydrofonu: {species_name} (Pewność: {confidence:.2f})")
+                self.result_label.config(text=f"Rozpoznany gatunek: {species_name} (Pewność: {confidence:.2f})")
         else:
-            self.result_label_lab.config(text="Błąd: Brak danych do rozpoznania")
+            messagebox.showerror("Błąd", "Brak danych do rozpoznania")
 
     def stream_audio(self):
         response = requests.get(self.url, stream=True)
@@ -107,6 +106,6 @@ class Live:
 
 if __name__ == "__main__":
     url = "https://live.orcasound.net/listen/port-townsend"
-    result_label_lab = tk.Label(text="")
+    result_label_lab = Label(text="", font=("Helvetica", 14), bg="lightblue")
     live_recognition = Live(url, result_label_lab)
     live_recognition.start_live_recognition()
